@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect
 from data import db_session
 from data.users import User
+from data.jobs import Jobs
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms.user import LoginForm, RegisterForm
 
@@ -12,16 +13,12 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    print(user_id)
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
 
 def main():
     db_session.global_init("db/blogs.db")
-    dbs = db_session.create_session()
-    dbs.query(User).delete()
-    dbs.commit()
     app.run()
 
 
@@ -71,7 +68,14 @@ def reqister():
 @app.route("/")
 def index():
     if current_user.is_authenticated:
-        return render_template("base.html")
+        dbs = db_session.create_session()
+        jobs = dbs.query(Jobs).filter(((Jobs.collaborators.like(f'% {current_user.id}%')) |
+                                      (Jobs.collaborators.like(f'%{current_user.id},%')) |
+                                      (Jobs.collaborators == str(current_user.id))),
+                                      Jobs.is_finished == False)
+        return render_template("index.html", jobs=jobs,
+                               teams=[[dbs.query(User).filter(User.id == int(uid)).first()
+                                       for uid in job.collaborators.split(", ")] for job in jobs])
     else:
         return redirect('/login')
 
