@@ -18,7 +18,8 @@
         {% if current_user.is_authenticated %}
             <p>
                 <a>{{ current_user.name }}</a>
-                <a class="btn btn-primary" href="/logout">Выйти</a>
+                <a class="btn btn-primary" href="/addjob">Добавить работу</a>
+                <a class="btn btn-danger" href="/logout">Выйти</a>
             </p>
         {% else %}
             <p>

@@ -4,6 +4,7 @@ from data.users import User
 from data.jobs import Jobs
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms.user import LoginForm, RegisterForm
+from forms.job import AddJobForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -69,15 +70,21 @@ def reqister():
 def index():
     if current_user.is_authenticated:
         dbs = db_session.create_session()
-        jobs = dbs.query(Jobs).filter(((Jobs.collaborators.like(f'% {current_user.id}%')) |
+        jobs = dbs.query(Jobs).filter((Jobs.collaborators.like(f'% {current_user.id}%')) |
                                       (Jobs.collaborators.like(f'%{current_user.id},%')) |
-                                      (Jobs.collaborators == str(current_user.id))),
-                                      Jobs.is_finished == False)
+                                      (Jobs.collaborators == str(current_user.id)))
         return render_template("index.html", jobs=jobs,
-                               teams=[[dbs.query(User).filter(User.id == int(uid)).first()
-                                       for uid in job.collaborators.split(", ")] for job in jobs])
+                               teams=[", ".join(get_users(job, dbs)) for job in jobs])
     else:
         return redirect('/login')
+
+
+def get_users(job, dbs):
+    users = []
+    for u_id in job.collaborators.split(", "):
+        ans = dbs.query(User).filter(User.id == int(u_id)).first()
+        users.append(f"{ans.surname} {ans.name}")
+    return users
 
 
 @app.route('/logout')
@@ -85,6 +92,24 @@ def index():
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route("/addjob", methods=['GET', 'POST'])
+def addjob():
+    form = AddJobForm()
+    if form.validate_on_submit():
+        dbs = db_session.create_session()
+        job = Jobs(
+            job=form.job.data,
+            team_leader=form.leader_id.data,
+            work_size=form.work_size.data,
+            collaborators=form.collaborators.data,
+            is_finished=form.is_finished.data
+        )
+        dbs.add(job)
+        dbs.commit()
+        return redirect("/")
+    return render_template('addjob.html', title='Добавление работы', form=form)
 
 
 if __name__ == '__main__':

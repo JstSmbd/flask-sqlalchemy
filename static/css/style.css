@@ -47,3 +47,7 @@ gray {
     color: gray;
     font-size: 20px;
 }
+
+th {
+    font-weight: normal;
+}
