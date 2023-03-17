@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect
 from data import db_session
 from data.users import User
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from forms.user import LoginForm, RegisterForm
 
 app = Flask(__name__)
@@ -12,12 +12,16 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
+    print(user_id)
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
 
 def main():
     db_session.global_init("db/blogs.db")
+    dbs = db_session.create_session()
+    dbs.query(User).delete()
+    dbs.commit()
     app.run()
 
 
@@ -52,13 +56,31 @@ def reqister():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            about=form.about.data
+            surname=form.surname.data,
+            age=form.age.data,
+            position=form.position.data,
+            speciality=form.speciality.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/login')
+        return redirect('/')
     return render_template('register.html', title='Регистрация', form=form)
+
+
+@app.route("/")
+def index():
+    if current_user.is_authenticated:
+        return render_template("base.html")
+    else:
+        return redirect('/login')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
 
 
 if __name__ == '__main__':

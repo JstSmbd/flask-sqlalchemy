@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, BooleanField
+from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, \
+    BooleanField, IntegerField, SelectField
 from wtforms.validators import DataRequired
 
 
@@ -11,9 +12,14 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    email = EmailField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
-    name = StringField('Имя пользователя', validators=[DataRequired()])
-    about = TextAreaField("Немного о себе")
-    submit = SubmitField('Войти')
+    email = EmailField('Почта', validators=[DataRequired()], name="email")
+    password = PasswordField('Пароль', validators=[DataRequired()], name="password")
+    password_again = PasswordField('Повторите пароль', validators=[DataRequired()], name="password")
+    name = StringField('Имя', validators=[DataRequired()])
+    surname = StringField('Фамилия', validators=[DataRequired()])
+    age = IntegerField('Возраст', validators=[DataRequired()])
+    position = SelectField("Позиция", validators=[DataRequired()], name="button",
+                           choices=["Инженер", "Капитан", "Исследователь", "Геолог", "Штурман"])
+    speciality = SelectField("Профессия", validators=[DataRequired()], name="button",
+                             choices=["Инженер", "Капитан", "Исследователь", "Геолог", "Штурман"])
+    submit = SubmitField('Войти', name="enter")
