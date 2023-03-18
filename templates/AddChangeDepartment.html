@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Добавление работы</h1>
+<h1>Добавление департамента</h1>
+<br>
 <form action="" method="post">
     {{ form.hidden_tag() }}
-    {% for field in form if field.name not in ('csrf_token', "enter", "checkbox") %}
+    {% for field in form if field.name not in ('csrf_token', "enter") %}
         <p>
             {{ field.label }}<br>
-            {% if job %}
-            {{ field(class="form-control", type=field.name, value=job[field.name]) }}<br>
+            {% if dep %}
+            {{ field(class="form-control", type=field.name, value=dep[field.name]) }}<br>
             {% else %}
             {{ field(class="form-control", type=field.name) }}<br>
             {% endif %}
@@ -19,8 +20,10 @@
             {% endfor %}
         </p>
     {% endfor %}
-    <p>{{ form.is_finished(type="checkbox") }} {{ form.is_finished.label() }}</p>
-    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    <a>
+        <a>{{ form.submit(type="submit", class="btn btn-primary") }}</a>
+        <a class="btn btn-danger" href="/departments">Назад</a>
+    </a>
     {{message}}
 </form>
 {% endblock %}

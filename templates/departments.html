@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if deps %}
+    <h1 class="center">Департаменты</h1>
+    <p>
+        <a class="btn btn-primary" href="/add_department">Добавить департамент</a>
+        <a class="btn btn-secondary" href="/jobs">Перейти к работам</a>
+    </p>
+{% else %}
+    <h1 class="center">Нет департаментов</h1>
+    <p class="center">
+        <a class="btn btn-primary" href="/add_department">Добавить департамент</a>
+        <a class="btn btn-secondary" href="/jobs">Перейти к работам</a>
+    </p>
+{% endif %}
+{% for dep in deps %}
+    <br>
+    <h4>Департамент # {{ loop.index }}</h4>
+    <table class="table">
+        <tr bgcolor="#ccc">
+            <td>Описание департамента</td>
+            <td>Главный</td>
+            <td>Участники</td>
+            <td>email департамента</td>
+        </tr>
+        <tr bgcolor="#94abff">
+            <td>{{ dep.title }}</td>
+            <td>{% if dep.user %} {{ dep.user.surname }} {{dep.user.name}} {% else %}Неизвестно Кто{% endif %}</td>
+            <td>{{ teams[loop.index - 1] }}</td>
+            <td>{{ dep.email }}</td>
+        </tr>
+    </table>
+    {% if dep.user %}
+        {% set tema_leader = dep.user.id %}
+    {% else %}
+        {% set tema_leader = 1 %}
+    {% endif %}
+    {% if current_user.id in (1, dep.creator, team_leader) %}
+    <p>
+        <a class="btn btn-primary" href="/change_department/{{ dep.id }}" >Поменять департамент</a>
+        <a class="btn btn-danger" href="/delete_department/{{ dep.id }}" >Удалить департамент</a>
+    </p>
+    {% endif %}
+{% endfor %}
+{% endblock %}

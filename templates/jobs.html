@@ -3,10 +3,19 @@
 {% block content %}
 {% if jobs %}
     <h1 class="center">Работы</h1>
+    <p>
+        <a class="btn btn-primary" href="/add_job">Добавить работу</a>
+        <a class="btn btn-secondary" href="/departments">Перейти к департаментам</a>
+    </p>
 {% else %}
     <h1 class="center">Нет работ</h1>
+    <p class="center">
+        <a class="btn btn-primary" href="/add_job">Добавить работу</a>
+        <a class="btn btn-secondary" href="/departments">Перейти к департаментам</a>
+    </p>
 {% endif %}
 {% for job in jobs %}
+    <br>
     <h4>Работа # {{loop.index}}</h4>
     <table class="table">
         <tr bgcolor="#ccc">
