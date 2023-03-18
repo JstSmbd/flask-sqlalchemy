@@ -74,7 +74,8 @@ def index():
                                       (Jobs.collaborators.like(f'%{current_user.id},%')) |
                                       (Jobs.collaborators == str(current_user.id)))
         return render_template("index.html", jobs=jobs,
-                               teams=[", ".join(get_users(job, dbs)) for job in jobs])
+                               teams=[", ".join(get_users(job, dbs)) for job in jobs],
+                               title="Работы")
     else:
         return redirect('/login')
 
@@ -82,8 +83,11 @@ def index():
 def get_users(job, dbs):
     users = []
     for u_id in job.collaborators.split(", "):
-        ans = dbs.query(User).filter(User.id == int(u_id)).first()
-        users.append(f"{ans.surname} {ans.name}")
+        try:
+            ans = dbs.query(User).filter(User.id == int(u_id)).first()
+            users.append(f"{ans.surname} {ans.name}")
+        except (AttributeError, ValueError):
+            users.append(f"Неизвестно Кто")
     return users
 
 
@@ -104,12 +108,49 @@ def addjob():
             team_leader=form.leader_id.data,
             work_size=form.work_size.data,
             collaborators=form.collaborators.data,
-            is_finished=form.is_finished.data
+            is_finished=form.is_finished.data,
+            creator=current_user.id
         )
         dbs.add(job)
         dbs.commit()
         return redirect("/")
     return render_template('addjob.html', title='Добавление работы', form=form)
+
+
+@app.route("/change_job/<int:j_id>", methods=['GET', 'POST'])
+def change_job(j_id):
+    dbs = db_session.create_session()
+    job = dbs.query(Jobs).filter(Jobs.id == j_id).first()
+    form = AddJobForm()
+    if form.validate_on_submit() and current_user.id in (1, job.creator,
+                                                         (job.user.id if job.user else 1)):
+        job.job = form.job.data
+        job.team_leader = form.leader_id.data
+        job.work_size = form.work_size.data
+        job.collaborators = form.collaborators.data
+        job.is_finished = form.is_finished.data
+        dbs.commit()
+        return redirect("/")
+    elif current_user.id in (1, job.creator, (job.user.id if job.user else 1)):
+        return render_template('addjob.html', title='Добавление работы', form=form, job={
+            "job": job.job,
+            "leader_id": job.team_leader,
+            "work_size": job.work_size,
+            "collaborators": job.collaborators,
+            "checkbox": job.is_finished
+        })
+    else:
+        return redirect("/")
+
+
+@app.route("/delete_job/<int:j_id>")
+def delete_job(j_id):
+    dbs = db_session.create_session()
+    job = dbs.query(Jobs).filter(Jobs.id == j_id).first()
+    if current_user.id in (1, job.creator, (job.user.id if job.user else 1)):
+        dbs.delete(job)
+        dbs.commit()
+    return redirect("/")
 
 
 if __name__ == '__main__':

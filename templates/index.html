@@ -18,7 +18,7 @@
         </tr>
         <tr bgcolor="#94abff">
             <td>{{ job.job }}</td>
-            <td>{{ job.user.surname }} {{ job.user.name }}</td>
+            <td>{% if job.user %} {{ job.user.surname }} {{job.user.name}} {% else %}Неизвестно Кто{% endif %}</td>
             <td>{{ job.work_size }}</td>
             <td>{{ teams[loop.index - 1] }}</td>
             {% if job.is_finished %}
@@ -28,5 +28,16 @@
             {% endif %}
         </tr>
     </table>
+    {% if job.user %}
+        {% set tema_leader = job.user.id %}
+    {% else %}
+        {% set tema_leader = 1 %}
+    {% endif %}
+    {% if current_user.id in (1, job.creator, team_leader) %}
+    <p>
+        <a class="btn btn-primary" href="/change_job/{{ job.id }}" >Поменять работу</a>
+        <a class="btn btn-danger" href="/delete_job/{{ job.id }}" >Удалить работу</a>
+    </p>
+    {% endif %}
 {% endfor %}
 {% endblock %}

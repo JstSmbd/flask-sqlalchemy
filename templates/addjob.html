@@ -7,7 +7,11 @@
     {% for field in form if field.name not in ('csrf_token', "enter", "checkbox") %}
         <p>
             {{ field.label }}<br>
+            {% if job %}
+            {{ field(class="form-control", type=field.name, value=job[field.name]) }}<br>
+            {% else %}
             {{ field(class="form-control", type=field.name) }}<br>
+            {% endif %}
             {% for error in field.errors %}
                 <p class="alert alert-danger" role="alert">
                     {{ error }}

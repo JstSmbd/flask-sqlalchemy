@@ -13,7 +13,7 @@
 <body>
 <header>
     <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand" href="#">Mars One</a>
+        <a class="navbar-brand">Mars One</a>
         <h4 class="center">Миссия Колонизация Марса</h4>
         {% if current_user.is_authenticated %}
             <p>
@@ -23,7 +23,7 @@
             </p>
         {% else %}
             <p>
-                <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
+                <a class="btn btn-primary" href="/register">Зарегистрироваться</a>
                 <a class="btn btn-success" href="/login">Войти</a>
             </p>
         {% endif %}
