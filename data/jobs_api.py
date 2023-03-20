@@ -73,3 +73,15 @@ def create_job():
     dbs.add(job)
     dbs.commit()
     return jsonify({'success': 'OK'})
+
+
+@blueprint.route('/api/jobs/<int:job_id>', methods=['DELETE'])
+# @login_required
+def delete_job(job_id):
+    dbs = db_session.create_session()
+    job = dbs.query(Jobs).get(job_id)
+    if not job:
+        return jsonify({'error': 'Bad Request'})
+    dbs.delete(job)
+    dbs.commit()
+    return jsonify({'success': 'OK'})
