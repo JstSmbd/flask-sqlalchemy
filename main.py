@@ -13,7 +13,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-from data import jobs_api
+from data import jobs_api, users_api
 
 
 @app.errorhandler(404)
@@ -29,6 +29,7 @@ def bad_request(_):
 def main():
     db_session.global_init("db/blogs.db")
     app.register_blueprint(jobs_api.blueprint)
+    app.register_blueprint(users_api.blueprint)
     app.run()
 
 
