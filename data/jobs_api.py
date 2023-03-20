@@ -85,3 +85,24 @@ def delete_job(job_id):
     dbs.delete(job)
     dbs.commit()
     return jsonify({'success': 'OK'})
+
+
+@blueprint.route('/api/jobs/<int:job_id>', methods=['PUT'])
+# @login_required
+def change_job(job_id):
+    dbs = db_session.create_session()
+    job = dbs.query(Jobs).filter(Jobs.id == job_id).first()
+    try:
+        if not all([type(request.json[key]) == {"job": str, "team_leader": int, "work_size": int,
+                                                "collaborators": str, "is_finished": bool}[key]
+                    for key in request.json]) or not job:
+            return jsonify({'error': 'Bad request'})
+        job.job = request.json.get("job", job.job)
+        job.team_leader = request.json.get("team_leader", job.team_leader)
+        job.work_size = request.json.get("work_size", job.work_size)
+        job.collaborators = request.json.get("collaborators", job.collaborators)
+        job.is_finished = request.json.get("is_finished", job.is_finished)
+    except KeyError:
+        return jsonify({'error': 'Bad request'})
+    dbs.commit()
+    return jsonify({'success': 'OK'})
