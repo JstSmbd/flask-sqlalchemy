@@ -7,13 +7,14 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 from forms.user import LoginForm, RegisterForm
 from forms.job import AddChangeJobForm
 from forms.department import AddChangeDepartmentForm
+from flask_restful import reqparse, abort, Api, Resource
+from data import users_resource
 
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-from data import jobs_api, users_api
 
 
 @app.errorhandler(404)
@@ -28,8 +29,8 @@ def bad_request(_):
 
 def main():
     db_session.global_init("db/blogs.db")
-    app.register_blueprint(jobs_api.blueprint)
-    app.register_blueprint(users_api.blueprint)
+    api.add_resource(users_resource.UsersListResource, '/api/v2/users')
+    api.add_resource(users_resource.UsersResource, '/api/v2/users/<int:user_id>')
     app.run()
 
 
