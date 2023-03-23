@@ -8,7 +8,7 @@ from forms.user import LoginForm, RegisterForm
 from forms.job import AddChangeJobForm
 from forms.department import AddChangeDepartmentForm
 from flask_restful import reqparse, abort, Api, Resource
-from data import users_resource
+from data import users_resource, jobs_resource
 
 app = Flask(__name__)
 api = Api(app)
@@ -31,6 +31,8 @@ def main():
     db_session.global_init("db/blogs.db")
     api.add_resource(users_resource.UsersListResource, '/api/v2/users')
     api.add_resource(users_resource.UsersResource, '/api/v2/users/<int:user_id>')
+    api.add_resource(jobs_resource.JobsListResource, '/api/v2/jobs')
+    api.add_resource(jobs_resource.JobsResource, '/api/v2/jobs/<int:job_id>')
     app.run()
 
 
